@@ -1,7 +1,7 @@
 # Ad-blocker-extension-chrome
 Ad blocker and remover for Google Chrome
 
-Download Ad-blocker-extension-chrome.zip<br>
+Download Ad-blocker-extension-chrome-main.zip<br>
 Unzip it<br>
 Go to Chrome extensions: chrome://extensions/<br>
 In the top right corner enable "Developer mode"<br>
