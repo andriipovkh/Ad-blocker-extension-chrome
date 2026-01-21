@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Universal Ad Blocker (Google & LinkedIn)
 // @namespace    http://tampermonkey.net/
-// @version      1.2
-// @description  Removes Google, LinkedIn, and banner ads from all websites
+// @version      1.3
+// @description  Removes Google, LinkedIn, banner, and Sevio ads from all websites
 // @author       You
 // @match        *://*/*
 // @grant        none
@@ -81,13 +81,19 @@
             }
         });
         
-        // Remove banner ads (like unit_list_banner, nts-ad)
+        // Remove banner ads (like unit_list_banner, nts-ad, sevio ads)
         const bannerAds = document.querySelectorAll(
             '.unit_list_banner, ' +
             '.banner, ' +
             '.nts-ad, ' +
             '[class*="nts-ad"], ' +
-            '.advtext'
+            '.advtext, ' +
+            '.sevioads, ' +
+            '[class*="sevioads"], ' +
+            '[id*="sevio"], ' +
+            '[id*="wrapper-sevio"], ' +
+            '.noindex-section, ' +
+            '[data-nosnippet]'
         );
         bannerAds.forEach(banner => {
             // Check if it's an ad banner
@@ -95,9 +101,27 @@
                 banner.querySelector('.advtext') ||
                 banner.querySelector('.nts-ad') ||
                 banner.classList.contains('nts-ad') ||
-                banner.innerHTML.includes('Реклама')) {
+                banner.classList.contains('sevioads') ||
+                banner.id.includes('sevio') ||
+                banner.querySelector('.sevioads') ||
+                banner.querySelector('[id*="sevio"]') ||
+                banner.innerHTML.includes('Реклама') ||
+                banner.innerHTML.includes('adx.ws') ||
+                banner.innerHTML.includes('czilladx.com')) {
                 banner.remove();
                 adsRemoved++;
+            }
+        });
+        
+        // Remove ad labels/badges
+        const adLabels = document.querySelectorAll('span.bg-white');
+        adLabels.forEach(label => {
+            if (label.textContent.trim() === 'Ad') {
+                const parent = label.closest('.position-relative');
+                if (parent) {
+                    parent.remove();
+                    adsRemoved++;
+                }
             }
         });
         
@@ -171,6 +195,8 @@
         iframe[id*="google_ads"],
         iframe[src*="googlesyndication"],
         iframe[src*="doubleclick"],
+        iframe[src*="adx.ws"],
+        iframe[src*="czilladx"],
         .adsbygoogle,
         [id*="google_ads"],
         .sdaContainer,
@@ -183,7 +209,12 @@
         .unit_list_banner,
         .nts-ad,
         [class*="nts-ad"],
-        .advtext {
+        .advtext,
+        .sevioads,
+        [id*="sevio"],
+        [id*="wrapper-sevio"],
+        div[id*="sevio_iframe"],
+        .noindex-section[data-nosnippet] {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
