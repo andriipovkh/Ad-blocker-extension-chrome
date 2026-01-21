@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Google Ad Blocker",
+  "version": "1.0",
+  "description": "Removes all google ads",
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
