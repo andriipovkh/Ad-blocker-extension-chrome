@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Universal Ad Blocker (Google & LinkedIn)
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  Removes Google, LinkedIn, banner, and Sevio ads from all websites
 // @author       You
 // @match        *://*/*
@@ -69,13 +69,20 @@
             'div[data-account*="sponsoredAccount"], ' +
             '.da-card-creative, ' +
             'div.da, ' +
-            'div[class*="da--"]'
+            'div[class*="da--"], ' +
+            '.ad-banner-container, ' +
+            'section.ad-banner-container, ' +
+            'iframe[data-ad-banner], ' +
+            'iframe.ad-banner'
         );
         linkedinAds.forEach(ad => {
             // Double-check it's a LinkedIn ad
             if (ad.querySelector('.al__label') || 
                 ad.querySelector('[class*="da-card"]') ||
-                ad.innerHTML.includes('sponsoredCreative')) {
+                ad.innerHTML.includes('sponsoredCreative') ||
+                ad.classList.contains('ad-banner-container') ||
+                ad.querySelector('iframe[data-ad-banner]') ||
+                ad.querySelector('iframe.ad-banner')) {
                 ad.remove();
                 adsRemoved++;
             }
@@ -197,6 +204,8 @@
         iframe[src*="doubleclick"],
         iframe[src*="adx.ws"],
         iframe[src*="czilladx"],
+        iframe[data-ad-banner],
+        iframe.ad-banner,
         .adsbygoogle,
         [id*="google_ads"],
         .sdaContainer,
@@ -214,7 +223,9 @@
         [id*="sevio"],
         [id*="wrapper-sevio"],
         div[id*="sevio_iframe"],
-        .noindex-section[data-nosnippet] {
+        .noindex-section[data-nosnippet],
+        .ad-banner-container,
+        section.ad-banner-container {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
