@@ -179,30 +179,6 @@
             }
         });
         
-        // Remove Twitter/X ads
-        const twitterAds = document.querySelectorAll(
-            'article[data-testid="tweet"]'
-        );
-        twitterAds.forEach(tweet => {
-            // Check if it contains "Ad" label or ad tracking
-            const adLabel = tweet.querySelector('[class*="css-146c3p1"]:has([class*="css-1jxf684"])');
-            const hasAdText = adLabel && (adLabel.textContent === 'Ad' || adLabel.textContent.includes('Ad'));
-            const hasAdTracking = tweet.querySelector('[data-testid="placementTracking"]');
-            const hasDoubleClickUrl = tweet.innerHTML.includes('doubleclick.net');
-            
-            if (hasAdText || hasAdTracking || hasDoubleClickUrl) {
-                // Find the parent container
-                const container = tweet.closest('[data-testid="cellInnerDiv"]');
-                if (container) {
-                    container.remove();
-                    adsRemoved++;
-                } else {
-                    tweet.remove();
-                    adsRemoved++;
-                }
-            }
-        });
-        
         // Remove full-page overlay ads (brnd/schulist.link and similar)
         const overlayAds = document.querySelectorAll(
             'div[id*="brnd"], ' +
@@ -398,13 +374,6 @@
         [class*="promotedlink"],
         [slot="full-comments-page-ad-link"],
         [post-promoted],
-        [data-testid="cellInnerDiv"]:has([data-testid="placementTracking"]) {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            height: 0 !important;
-            width: 0 !important;
-        }
     `;
     document.head.appendChild(style);
 })();
