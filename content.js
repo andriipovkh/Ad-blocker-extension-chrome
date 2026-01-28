@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Universal Ad Blocker (Google & LinkedIn)
 // @namespace    http://tampermonkey.net/
-// @version      2.1
-// @description  Removes Google, LinkedIn, YouTube, Reddit, Twitter/X, overlay, banner, srv224, bashirian.biz and Sevio ads from all websites
+// @version      2.3
+// @description  Removes Google, LinkedIn, YouTube, Reddit, Twitter/X, overlay, banner, srv224, bashirian.biz, Sevio, and Ookla/outstream video ads from all websites
 // @author       You
 // @match        *://*/*
 // @grant        none
@@ -255,6 +255,76 @@
             }
         });
         
+        // Remove Ookla video ads (pgrecirc campaign)
+        const ooklaAds = document.querySelectorAll(
+            'div.VP, ' +
+            'a.VPA[href*="ookla.com"], ' +
+            'a.VPA[href*="pgrecirc"], ' +
+            'video.VPP[src*="cdnst.net"], ' +
+            'div.VPUI, ' +
+            'span.VPTitle, ' +
+            'div.pgVPCMD'
+        );
+        ooklaAds.forEach(ad => {
+            // Check if it's an Ookla video ad
+            if (ad.classList.contains('VP') ||
+                (ad.classList.contains('VPA') && (ad.href.includes('ookla.com') || ad.href.includes('pgrecirc'))) ||
+                (ad.classList.contains('VPP') && ad.src && ad.src.includes('cdnst.net')) ||
+                ad.querySelector('.VPA[href*="ookla.com"]') ||
+                ad.querySelector('.VPA[href*="pgrecirc"]') ||
+                ad.querySelector('video.VPP[src*="cdnst.net"]') ||
+                ad.querySelector('.VPUI') ||
+                ad.querySelector('.VPTitle') ||
+                ad.querySelector('.pgVPCMD')) {
+                // Find the root container (div.VP) and remove it
+                const vpContainer = ad.closest('div.VP') || ad;
+                vpContainer.remove();
+                adsRemoved++;
+            }
+        });
+        
+        // Remove outstream/pgrecircvideo ads (innovid, imasdk)
+        const outstreamAds = document.querySelectorAll(
+            'div[data-pogo="outstream"], ' +
+            '#pgrecircvideo, ' +
+            'div.pgOts, ' +
+            'div.VPV, ' +
+            'span.pgCloseBtn, ' +
+            'span.pgClose, ' +
+            'div.paused.adplaying, ' +
+            'video[title="Advertisement"], ' +
+            'iframe[src*="imasdk.googleapis.com"], ' +
+            'iframe[src*="innovid.com"], ' +
+            'video[src*="innovid.com"]'
+        );
+        outstreamAds.forEach(ad => {
+            // Check if it's an outstream video ad
+            if (ad.hasAttribute('data-pogo') && ad.getAttribute('data-pogo') === 'outstream' ||
+                ad.id === 'pgrecircvideo' ||
+                ad.classList.contains('pgOts') ||
+                ad.classList.contains('VPV') ||
+                ad.classList.contains('pgCloseBtn') ||
+                ad.classList.contains('pgClose') ||
+                (ad.classList.contains('paused') && ad.classList.contains('adplaying')) ||
+                (ad.tagName === 'VIDEO' && ad.title === 'Advertisement') ||
+                (ad.tagName === 'IFRAME' && ad.src && ad.src.includes('imasdk.googleapis.com')) ||
+                (ad.tagName === 'IFRAME' && ad.src && ad.src.includes('innovid.com')) ||
+                (ad.tagName === 'VIDEO' && ad.src && ad.src.includes('innovid.com')) ||
+                ad.querySelector('div[data-pogo="outstream"]') ||
+                ad.querySelector('#pgrecircvideo') ||
+                ad.querySelector('.pgOts') ||
+                ad.querySelector('.VPV') ||
+                ad.querySelector('video[title="Advertisement"]') ||
+                ad.querySelector('iframe[src*="imasdk.googleapis.com"]') ||
+                ad.querySelector('iframe[src*="innovid.com"]') ||
+                ad.querySelector('video[src*="innovid.com"]')) {
+                // Find the root container and remove it
+                const outstreamContainer = ad.closest('div[data-pogo="outstream"]') || ad;
+                outstreamContainer.remove();
+                adsRemoved++;
+            }
+        });
+        
         if (adsRemoved > 0) {
             console.log(`Removed ${adsRemoved} ad(s)`);
         }
@@ -374,6 +444,31 @@
         [class*="promotedlink"],
         [slot="full-comments-page-ad-link"],
         [post-promoted],
+        div.VP,
+        a.VPA[href*="ookla.com"],
+        a.VPA[href*="pgrecirc"],
+        video.VPP[src*="cdnst.net"],
+        div.VPUI,
+        span.VPTitle,
+        span.VProgCnt,
+        span.VProgress,
+        div.pgVPCMD,
+        span.pgVPlayBtn,
+        span.pgVMuteBtn,
+        div[data-pogo="outstream"],
+        #pgrecircvideo,
+        div.pgOts,
+        div.VPV,
+        span.pgCloseBtn,
+        span.pgClose,
+        div.paused.adplaying,
+        video[title="Advertisement"],
+        iframe[src*="imasdk.googleapis.com"],
+        iframe[src*="innovid.com"],
+        video[src*="innovid.com"] {
+            display: none !important;
+            visibility: hidden !important;
+        }
     `;
     document.head.appendChild(style);
 })();
